@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
 import "./App.css";
 import { useState } from "react";
 
@@ -10,16 +10,10 @@ function App() {
   ]);
   let [likeBtn, setCount] = useState([0, 0, 0]);
   let [modal, setModal] = useState(false);
+  let [modal_title, setModalTitle] = useState(0);
+  let [input_value, setInputValue] = useState("");
 
-  let onClick = () => {
-    for (let i = 0; i < 3; i++) {
-      if (likeBtn[i]) {
-        setCount(likeBtn[i] + 1);
-      }
-    }
-  };
-
-  let onClick2 = () => {
+  let changeTitle = () => {
     let copy = [...sub_title];
     copy[0] = "여자코트 추천";
     setTitle(copy);
@@ -34,29 +28,6 @@ function App() {
       <div className="black-nav">
         <h4>ReactBlog</h4>
       </div>
-      {/* <div className="list">
-        <h4>
-          {sub_title[0]} <span onClick={onClick}>⭐️</span> {likeBtn}
-          <button onClick={onClick2}>change!</button>
-          <button onClick={sort}>sort</button>
-        </h4>
-        <p>2월 17일 발행</p>
-      </div>
-      <div className="list">
-        <h4
-          onClick={() => {
-            setModal(!modal);
-            // setModal(modal === true ? false : true);
-          }}
-        >
-          {sub_title[1]}
-        </h4>
-        <p>2월 17일 발행</p>
-      </div>
-      <div className="list">
-        <h4>{sub_title[2]}</h4>
-        <p>2월 17일 발행</p>
-      </div> */}
 
       {sub_title.map(function (a, i) {
         return (
@@ -64,11 +35,33 @@ function App() {
             <h4
               onClick={() => {
                 setModal(!modal);
+                setModalTitle(i);
               }}
             >
-              {sub_title[i]} <span onClick={onClick}>⭐️</span> {likeBtn[i]}
-              <button onClick={onClick2}>change!</button>
+              {sub_title[i]}{" "}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  let copy = [...likeBtn];
+                  copy[i] = copy[i] + 1;
+                  console.log(copy);
+                  setCount(copy);
+                }}
+              >
+                🎐
+              </span>{" "}
+              {likeBtn[i]}
+              <button onClick={changeTitle}>change!</button>
               <button onClick={sort}>sort</button>
+              <button
+                onClick={() => {
+                  let copy = [...sub_title];
+                  copy.splice(i, 1);
+                  setTitle(copy);
+                }}
+              >
+                delete
+              </button>
             </h4>
             <p>2월 17일 발행</p>
           </div>
@@ -76,17 +69,36 @@ function App() {
       })}
 
       <Emoji />
-      {modal === true ? <Modal></Modal> : null}
+
+      <input
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          // console.log(input_value);
+        }}
+      />
+      <button
+        onClick={() => {
+          let copy = [...sub_title];
+          copy.unshift(input_value);
+          setTitle(copy);
+        }}
+      >
+        글발행
+      </button>
+      {modal === true ? (
+        <Modal modal_title={modal_title} sub_title={sub_title} />
+      ) : null}
     </div>
   );
 }
 
-function Modal() {
+function Modal(props) {
   return (
     <div className="modal">
-      <h4>제목</h4>
+      <h4>{props.sub_title[props.modal_title]}</h4>
       <p>날짜</p>
       <p>상세내용</p>
+      <button>글 수정</button>
     </div>
   );
 } //component
@@ -94,4 +106,5 @@ function Modal() {
 function Emoji() {
   return <span>🎐</span>;
 }
+
 export default App;
